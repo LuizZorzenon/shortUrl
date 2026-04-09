@@ -63,5 +63,11 @@ public class UrlService {
         return urlMapper.toResponse(url);
     }
 
+    public UrlResponse urlUpdate(UrlRequest urlRequest, String shortCode){
+        UrlModel url = urlRepository.findByShortUrl(shortCode)
+                .orElseThrow(() -> new RuntimeException("URL não encontrada!"));
+        UrlModel savedUrl = urlRepository.save(urlMapper.updateUrl(url, urlRequest));
+        return urlMapper.toResponse(savedUrl);
+    }
 
 }

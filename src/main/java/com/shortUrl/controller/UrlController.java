@@ -3,7 +3,6 @@ package com.shortUrl.controller;
 
 import com.shortUrl.dto.UrlRequest;
 import com.shortUrl.dto.UrlResponse;
-import com.shortUrl.entity.UrlModel;
 import com.shortUrl.service.UrlService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,24 +27,18 @@ public class UrlController {
     public ResponseEntity<UrlResponse> getUrlByShortCode(@PathVariable String shortcode){
         UrlResponse url = urlService.getUrlByShortCode(shortcode);
         return ResponseEntity.ok(url);
-
     }
 
     @PostMapping("/create")
     public ResponseEntity<UrlResponse> createShortUrl(@RequestBody UrlRequest url){
         UrlResponse createdUrl = urlService.createShortUrl(url);
-
         return ResponseEntity.ok(createdUrl);
     }
 
-    @PatchMapping("/{id}")
-    public String updateUrl(@RequestBody UrlModel urlModel, Long id){
-        return "Url atualizada";
+    @PatchMapping("/{shortcode}")
+    public ResponseEntity<UrlResponse> updateUrl(@RequestBody UrlRequest urlRequest,@PathVariable String shortcode){
+        return ResponseEntity.ok(urlService.urlUpdate(urlRequest ,shortcode));
     }
 
-    @DeleteMapping("/{id}")
-    public String deleteUrl(Long id){
-        return "Url deletada!";
-    }
 
 }

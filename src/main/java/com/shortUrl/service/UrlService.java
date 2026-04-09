@@ -24,6 +24,35 @@ public class UrlService {
     @Value("${app.base_url}")
     private String domain;
 
+    // Services used by controller
+    public List<UrlResponse> getAllUrls(){
+        return urlRepository.findAll()
+                .stream().map(urlMapper::toResponse)
+                .toList();
+    }
+
+    public UrlResponse getUrlByShortCode(String shortCode){
+        UrlModel url = urlRepository.findByShortUrl(shortCode)
+                .orElseThrow(() -> new RuntimeException("URL não encontrada!"));
+
+        return urlMapper.toResponse(url);
+    }
+
+    public UrlResponse urlUpdate(UrlRequest urlRequest, String shortCode){
+        UrlModel url = urlRepository.findByShortUrl(shortCode)
+                .orElseThrow(() -> new RuntimeException("URL não encontrada!"));
+        UrlModel savedUrl = urlRepository.save(urlMapper.updateUrl(url, urlRequest));
+        return urlMapper.toResponse(savedUrl);
+    }
+
+    public void deleteUrl(String shortCode){
+        UrlModel url = urlRepository.findByShortUrl(shortCode)
+                .orElseThrow(() -> new RuntimeException("URL não encontrada!"));
+
+        urlRepository.delete(url);
+    }
+
+    // Services
     public String generateShortCode(){
         return UUID
                 .randomUUID()
@@ -50,24 +79,13 @@ public class UrlService {
         );
     }
 
-    public List<UrlResponse> getAllUrls(){
-        return urlRepository.findAll()
-                .stream().map(urlMapper::toResponse)
-                .toList();
-    }
-
-    public UrlResponse getUrlByShortCode(String shortCode){
+    public String redirectToUrl(String shortCode){
         UrlModel url = urlRepository.findByShortUrl(shortCode)
                 .orElseThrow(() -> new RuntimeException("URL não encontrada!"));
 
-        return urlMapper.toResponse(url);
-    }
+        url.setClicks(url.getClicks() + 1);
+        urlRepository.save(url);
 
-    public UrlResponse urlUpdate(UrlRequest urlRequest, String shortCode){
-        UrlModel url = urlRepository.findByShortUrl(shortCode)
-                .orElseThrow(() -> new RuntimeException("URL não encontrada!"));
-        UrlModel savedUrl = urlRepository.save(urlMapper.updateUrl(url, urlRequest));
-        return urlMapper.toResponse(savedUrl);
+        return url.getUrlBase();
     }
-
 }

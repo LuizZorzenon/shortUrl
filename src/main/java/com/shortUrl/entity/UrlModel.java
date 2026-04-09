@@ -2,6 +2,7 @@ package com.shortUrl.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.internal.constraintvalidators.hv.URLValidator;
 import org.springframework.data.annotation.CreatedDate;
@@ -28,9 +29,10 @@ public class UrlModel {
     private String shortUrl;
 
     @Column(name = "clicks")
-    private Long clicks;
+    @Builder.Default
+    private Long clicks = 0L;
 
-    @CreatedDate
+    @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp

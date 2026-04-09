@@ -1,27 +1,41 @@
 package com.shortUrl.controller;
 
 
+import com.shortUrl.dto.UrlRequest;
+import com.shortUrl.dto.UrlResponse;
 import com.shortUrl.entity.UrlModel;
+import com.shortUrl.service.UrlService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/url")
+@RequiredArgsConstructor
 public class UrlController {
 
+    private final UrlService urlService;
 
-    @GetMapping("")
-    public String getAllUrl(){
-        return "url!";
+    @GetMapping
+    public ResponseEntity<List<UrlResponse>> getAllUrl(){
+        List<UrlResponse> urls = urlService.getAllUrls();
+        return ResponseEntity.ok(urls);
     }
 
-    @GetMapping("/{id}")
-    public String getUrlById(Long id){
-        return "url com id";
+    @GetMapping("/{shortcode}")
+    public ResponseEntity<UrlResponse> getUrlByShortCode(@PathVariable String shortcode){
+        UrlResponse url = urlService.getUrlByShortCode(shortcode);
+        return ResponseEntity.ok(url);
+
     }
 
     @PostMapping("/create")
-    public String createShortUrl(@RequestBody UrlModel urlModel){
-        return "Url criada";
+    public ResponseEntity<UrlResponse> createShortUrl(@RequestBody UrlRequest url){
+        UrlResponse createdUrl = urlService.createShortUrl(url);
+
+        return ResponseEntity.ok(createdUrl);
     }
 
     @PatchMapping("/{id}")

@@ -34,13 +34,10 @@ public class UrlController {
     }
 
     @GetMapping("/r/{shortcode}")
-    public ResponseEntity<Void> redirectToUrl(@PathVariable String shortcode){
+    public ResponseEntity<String> redirectToUrl(@PathVariable String shortcode){
         String originalUrl = urlService.redirectToUrl(shortcode);
 
-        return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .header("location", originalUrl)
-                .build();
+        return ResponseEntity.ok("Url encontrada");
     }
 
     @PostMapping("/create")

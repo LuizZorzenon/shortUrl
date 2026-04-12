@@ -1,5 +1,6 @@
 package com.shortUrl.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -40,6 +41,10 @@ public class UserModel implements UserDetails {
     @UpdateTimestamp
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private List<UrlModel> urls;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities(){

@@ -3,11 +3,14 @@ package com.shortUrl.service;
 import com.shortUrl.dto.UrlRequest;
 import com.shortUrl.dto.UrlResponse;
 import com.shortUrl.entity.UrlModel;
+import com.shortUrl.entity.UserModel;
 import com.shortUrl.mapper.UrlMapper;
 import com.shortUrl.repository.UrlRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -26,8 +29,12 @@ public class UrlService {
 
     // Services used by controller
     public List<UrlResponse> getAllUrls(){
-        return urlRepository.findAll()
-                .stream().map(urlMapper::toResponse)
+
+        UserModel user = getUserContext();
+
+        return urlRepository.findByUser(user)
+                .stream()
+                .map(urlMapper::toResponse)
                 .toList();
     }
 
@@ -38,9 +45,19 @@ public class UrlService {
         return urlMapper.toResponse(url);
     }
 
+    public UserModel getUserContext(){
+        UserModel user = (UserModel) SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getPrincipal();
+        return user;
+    }
+
     public UrlResponse urlUpdate(UrlRequest urlRequest, String shortCode){
         UrlModel url = urlRepository.findByShortUrl(shortCode)
                 .orElseThrow(() -> new RuntimeException("URL não encontrada!"));
+
+        url.setShortUrl(generateShortCode());
+
         UrlModel savedUrl = urlRepository.save(urlMapper.updateUrl(url, urlRequest));
         return urlMapper.toResponse(savedUrl);
     }
@@ -63,10 +80,17 @@ public class UrlService {
     }
 
     public UrlResponse createShortUrl(UrlRequest request){
+
+        UserModel user = getUserContext();
+
         UrlModel newUrl = urlMapper.toModel(request);
+
         String shortCode = generateShortCode();
         newUrl.setShortUrl(shortCode);
+        newUrl.setUser(user);
+
         urlRepository.save(newUrl);
+
         UrlResponse response = urlMapper.toResponse(newUrl);
 
         return new UrlResponse(
@@ -86,6 +110,6 @@ public class UrlService {
         url.setClicks(url.getClicks() + 1);
         urlRepository.save(url);
 
-        return url.getUrlBase();
+        return "URL ENCONTRADA!";
     }
 }

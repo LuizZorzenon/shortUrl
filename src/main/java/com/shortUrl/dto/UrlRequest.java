@@ -1,4 +1,4 @@
 package com.shortUrl.dto;
 
-public record UrlRequest(String urlBase) {
+public record UrlRequest(String urlBase, String shortUrl) {
 }

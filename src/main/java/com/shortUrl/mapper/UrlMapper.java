@@ -28,7 +28,7 @@ public class UrlMapper {
 
     public UrlModel updateUrl(UrlModel urlModel, UrlRequest urlRequest){
         if(urlRequest.urlBase() != null) urlModel.setUrlBase(urlRequest.urlBase());
-        if(urlRequest.urlBase() != null) urlModel.setShortUrl("12131");
+        if(urlRequest.urlBase() != null) urlModel.setShortUrl(urlRequest.shortUrl());
 
         return urlModel;
     }
